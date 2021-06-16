@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using AutoMapper;
+using API.Helpers;
 
 namespace API {
     public class Startup {
@@ -26,11 +28,10 @@ namespace API {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddScoped<IProductRepository, ProductRepository>();
-
+            services.AddScoped(typeof (IGenericRepository<>), (typeof (GenericRepository<>)));
+            services.AddAutoMapper(typeof (MappingProfiles));
             services.AddControllers();
-
             services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnectionString("DefaultConnection")));
-
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
@@ -47,6 +48,8 @@ namespace API {
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseStaticFiles();
 
             app.UseAuthorization();
 
